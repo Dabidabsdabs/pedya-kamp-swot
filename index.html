@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedya Kamp SWOT Analysis</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: #fff;
+    color: #1a1a1a;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Progress bar ───────────────────────────────── */
+  #progress-bar {
+    position: fixed; top: 0; left: 0;
+    height: 3px; background: #1B4F72;
+    transition: width 0.4s ease; z-index: 200;
+  }
+
+  /* ── Top header ─────────────────────────────────── */
+  .top-header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #f0f0f0;
+    z-index: 100;
+  }
+  .top-logo { font-size: 13px; font-weight: 700; color: #1B4F72; letter-spacing: 0.02em; }
+  .top-step { font-size: 12px; color: #aaa; }
+
+  /* ── Page wrapper ───────────────────────────────── */
+  .page-wrap {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 80px 24px 110px;
+  }
+
+  /* ── Screens ────────────────────────────────────── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp .3s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+
+  /* ── Cover ──────────────────────────────────────── */
+  .cover { text-align: center; padding: 48px 0 32px; }
+  .cover-title { font-size: 42px; font-weight: 800; color: #1B4F72; line-height: 1.15; }
+  .cover-sub { font-size: 17px; font-weight: 600; color: #2874A6; margin-top: 6px; }
+  .cover-bar { width: 48px; height: 3px; background: #2874A6; border-radius: 2px; margin: 20px auto; }
+  .cover-body { font-size: 14.5px; color: #666; max-width: 480px; margin: 0 auto 36px; line-height: 1.85; }
+  .cover-quote { font-size: 13px; font-style: italic; color: #bbb; margin-top: 28px; }
+
+  /* ── Section header ─────────────────────────────── */
+  .sec-badge {
+    display: inline-block;
+    background: #1B4F72; color: #fff;
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .sec-title { font-size: 26px; font-weight: 800; color: #1a1a1a; margin-bottom: 6px; line-height: 1.3; }
+  .sec-desc  { font-size: 14px; color: #777; margin-bottom: 36px; line-height: 1.75; }
+
+  /* ── Quadrant card ──────────────────────────────── */
+  .quad-card { border: 1px solid #efefef; border-radius: 12px; margin-bottom: 28px; overflow: hidden; }
+
+  .quad-head {
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .quad-head.s { background: #eafaf1; }
+  .quad-head.w { background: #fef5e7; }
+  .quad-head.o { background: #ebf5fb; }
+  .quad-head.t { background: #fef9e7; }
+
+  .quad-emoji { font-size: 18px; }
+  .quad-title { font-size: 14.5px; font-weight: 700; color: #1a1a1a; }
+  .quad-tag   { font-size: 12px; color: #999; margin-left: auto; }
+
+  /* Guide toggle */
+  .guide-toggle {
+    padding: 7px 18px;
+    background: #fafafa; border-bottom: 1px solid #f0f0f0;
+    font-size: 12px; color: #2874A6;
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+    user-select: none;
+  }
+  .guide-toggle:hover { background: #f3f3f3; }
+  .guide-toggle .arrow { transition: transform .2s; font-size: 10px; }
+  .guide-toggle.open .arrow { transform: rotate(90deg); }
+
+  .guide-body {
+    display: none;
+    padding: 12px 18px 14px;
+    background: #fafafa; border-bottom: 1px solid #f0f0f0;
+  }
+  .guide-body.open { display: block; }
+  .guide-body ol { padding-left: 16px; }
+  .guide-body li { font-size: 12.5px; color: #666; margin-bottom: 5px; line-height: 1.55; }
+
+  /* Answer rows */
+  .answers { padding: 14px 18px 16px; }
+
+  .ans-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .ans-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #f0f0f0; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #aaa;
+  }
+  .ans-input {
+    flex: 1;
+    border: none; border-bottom: 1.5px solid #e5e5e5;
+    padding: 7px 2px; font-size: 14px; color: #1a1a1a;
+    background: transparent; outline: none;
+    font-family: inherit; transition: border-color .2s;
+  }
+  .ans-input:focus { border-bottom-color: #2874A6; }
+  .ans-input::placeholder { color: #ddd; }
+
+  /* ── About You fields ───────────────────────────── */
+  .field-grp { margin-bottom: 32px; }
+  .field-label { font-size: 16px; font-weight: 600; color: #1a1a1a; display: block; margin-bottom: 4px; }
+  .field-hint  { font-size: 12.5px; color: #aaa; margin-bottom: 8px; }
+  .field-input {
+    width: 100%; border: none; border-bottom: 2px solid #e5e5e5;
+    padding: 9px 2px; font-size: 15px; color: #1a1a1a;
+    background: transparent; outline: none; font-family: inherit;
+    transition: border-color .2s;
+  }
+  .field-input:focus { border-bottom-color: #2874A6; }
+
+  /* ── Nav bar ────────────────────────────────────── */
+  .nav-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.97); backdrop-filter: blur(6px);
+    border-top: 1px solid #f0f0f0; z-index: 100;
+  }
+  .nav-inner {
+    max-width: 660px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .btn {
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    border: none; font-family: inherit; transition: all .18s;
+  }
+  .btn-primary { background: #1B4F72; color: #fff; }
+  .btn-primary:hover { background: #154060; transform: translateY(-1px); }
+  .btn-secondary { background: transparent; color: #aaa; border: 1.5px solid #e5e5e5; }
+  .btn-secondary:hover { border-color: #bbb; color: #666; }
+  .btn-success { background: #229954; color: #fff; }
+  .btn-success:hover { background: #1a7a40; }
+  .btn-outline {
+    background: transparent; border: 1.5px solid #1B4F72; color: #1B4F72;
+    padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all .18s;
+  }
+  .btn-outline:hover { background: #ebf5fb; }
+
+  /* ── Summary ────────────────────────────────────── */
+  .summary-hero { text-align: center; padding: 16px 0 32px; }
+  .summary-hero h2 { font-size: 26px; font-weight: 800; color: #1B4F72; margin-bottom: 6px; }
+  .summary-hero p  { font-size: 14px; color: #888; }
+
+  .summary-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 36px; }
+
+  .sum-section { margin-bottom: 32px; }
+  .sum-sec-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #aaa;
+    margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0;
+  }
+  .sum-quad { margin-bottom: 14px; }
+  .sum-q-label {
+    font-size: 12.5px; font-weight: 700; color: #555; margin-bottom: 5px;
+  }
+  .sum-item {
+    font-size: 13px; color: #333;
+    padding: 3px 0 3px 12px; border-left: 2px solid #e0e0e0; margin-bottom: 2px;
+  }
+  .sum-empty { font-size: 12.5px; color: #ccc; font-style: italic; padding-left: 12px; }
+
+  @media (max-width: 580px) {
+    .cover-title { font-size: 30px; }
+    .sec-title { font-size: 21px; }
+    .quad-tag { display: none; }
+    .page-wrap { padding: 72px 16px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<div class="top-header">
+  <span class="top-logo">Pedya Kamp</span>
+  <span class="top-step" id="step-label"></span>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ══ COVER ══════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-cover">
+    <div class="cover">
+      <div class="cover-title">Pedya Kamp</div>
+      <div class="cover-sub">SWOT Analysis</div>
+      <div class="cover-bar"></div>
+      <div class="cover-body">
+        Welcome! This is an individual reflection activity to help Pedya Kamp prepare for its Strategic Planning session.<br><br>
+        You will go through <strong>6 functional areas</strong>. For each one, share your honest thoughts on Strengths, Weaknesses, Opportunities, and Threats — one item per box.<br><br>
+        Guide questions are available to help you think. This should take about <strong>20–30 minutes</strong>.
+      </div>
+      <div class="cover-quote">"Every child deserves to be seen, heard, and celebrated."</div>
+    </div>
+  </div>
+
+  <!-- ══ ABOUT YOU ═══════════════════════════════════════════ -->
+  <div class="screen" id="screen-about">
+    <div class="sec-badge">About You</div>
+    <div class="sec-title">👋 Let's start with you</div>
+    <div class="sec-desc">Before we dive in, tell us a little about yourself.</div>
+
+    <div class="field-grp">
+      <label class="field-label">Your Name *</label>
+      <input class="field-input" id="f-name" type="text" placeholder="e.g., Maria Santos" autocomplete="off">
+    </div>
+    <div class="field-grp">
+      <label class="field-label">Your Role / Position in PK *</label>
+      <div class="field-hint">e.g., Volunteer, Staff, Board Member, Program Coordinator</div>
+      <input class="field-input" id="f-role" type="text" placeholder="e.g., Volunteer" autocomplete="off">
+    </div>
+    <div class="field-grp">
+      <label class="field-label">Date of Session</label>
+      <input class="field-input" id="f-date" type="text" placeholder="e.g., June 28, 2026" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- Functional area screens rendered by JS -->
+  <div id="section-screens"></div>
+
+  <!-- ══ SYNTHESIS ═══════════════════════════════════════════ -->
+  <div class="screen" id="screen-synthesis">
+    <div class="sec-badge">Final Section</div>
+    <div class="sec-title">🔭 Overall SWOT Synthesis</div>
+    <div class="sec-desc">You've reflected on all six areas — great work! Now step back and look at the big picture. What stands out most across the whole organization? Enter one item per box.</div>
+
+    <div class="quad-card">
+      <div class="quad-head s">
+        <span class="quad-emoji">🏆</span>
+        <span class="quad-title">Top Organizational STRENGTHS</span>
+        <span class="quad-tag">across all areas</span>
+      </div>
+      <div class="answers" id="ans-syn-s"></div>
+    </div>
+
+    <div class="quad-card">
+      <div class="quad-head w">
+        <span class="quad-emoji">🔧</span>
+        <span class="quad-title">Top Organizational WEAKNESSES</span>
+        <span class="quad-tag">across all areas</span>
+      </div>
+      <div class="answers" id="ans-syn-w"></div>
+    </div>
+
+    <div class="quad-card">
+      <div class="quad-head o">
+        <span class="quad-emoji">🌱</span>
+        <span class="quad-title">Top Organizational OPPORTUNITIES</span>
+        <span class="quad-tag">across all areas</span>
+      </div>
+      <div class="answers" id="ans-syn-o"></div>
+    </div>
+
+    <div class="quad-card">
+      <div class="quad-head t">
+        <span class="quad-emoji">⚡</span>
+        <span class="quad-title">Top Organizational THREATS</span>
+        <span class="quad-tag">across all areas</span>
+      </div>
+      <div class="answers" id="ans-syn-t"></div>
+    </div>
+
+    <div class="quad-card">
+      <div class="quad-head" style="background:#f0f4ff;">
+        <span class="quad-emoji">📌</span>
+        <span class="quad-title">Strategic Priorities</span>
+        <span class="quad-tag">for the next planning period</span>
+      </div>
+      <div class="answers" id="ans-syn-p"></div>
+    </div>
+  </div>
+
+  <!-- ══ SUMMARY ════════════════════════════════════════════ -->
+  <div class="screen" id="screen-summary">
+    <div class="summary-hero">
+      <div style="font-size:48px;margin-bottom:12px;">✅</div>
+      <h2>Salamat! All done.</h2>
+      <p>Your SWOT reflection has been compiled below.<br>Download or copy it to share with the facilitator.</p>
+    </div>
+    <div class="summary-actions">
+      <button class="btn btn-primary" onclick="downloadTxt()">⬇ Download as Text</button>
+      <button class="btn btn-outline"  onclick="copyAll()">📋 Copy All Responses</button>
+      <button class="btn btn-secondary" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div id="summary-body"></div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- ══ NAV BAR ════════════════════════════════════════════════ -->
+<div class="nav-bar">
+  <div class="nav-inner">
+    <button class="btn btn-secondary" id="btn-prev" onclick="navigate(-1)" style="display:none">← Back</button>
+    <div></div>
+    <button class="btn btn-primary"  id="btn-next" onclick="navigate(1)">Start →</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════
+const SECTIONS = [
+  {
+    id: 'f1', badge: 'F1',
+    title: 'Programs & Service Delivery',
+    desc: 'Evaluate the quality, reach, and effectiveness of the 10-Day Kamp, Operasyon Makibata, and other services provided to children with special needs.',
+    quads: [
+      { type:'s', emoji:'💪', label:'STRENGTHS (Kalakasan)', tag:'What is working well?', qs:[
+        "What aspects of PK's activities consistently produce positive outcomes for kampers?",
+        "What makes PK's activities unique compared to similar programs?",
+        "How well-equipped are facilitators and volunteers in handling neurodiverse children?",
+        "What kamper and volunteer protection protocols are already in place?",
+        "How effective is communication during Kamp activities?"
+      ]},
+      { type:'w', emoji:'🔧', label:'WEAKNESSES (Kahinaan)', tag:'What are we struggling with?', qs:[
+        "Are there activities in Kamp that can be improved for a better experience for kampers and volunteers?",
+        "Is the equipment, facilities, and venues used in Kamp and OMs adequate for the needs of kampers and volunteers?",
+        "Are there inconsistencies in program quality across different provinces?",
+        "What monitoring and evaluation mechanisms are lacking?"
+      ]},
+      { type:'o', emoji:'🌱', label:'OPPORTUNITIES (Pagkakataon)', tag:'What can we take advantage of?', qs:[
+        "Are there provinces or communities not yet reached that could benefit from PK's programs?",
+        "Aside from Kamp and OMs, are there other activities PK can initiate to achieve its Vision?",
+        "What technology can enhance PK's service delivery and efficiency?"
+      ]},
+      { type:'t', emoji:'⚡', label:'THREATS (Banta/Hamon)', tag:'What could get in our way?', qs:[
+        "Do you have knowledge of possible changes in the school calendar that could affect Kamp activities?",
+        "Are there regulatory or legal requirements for programs serving minors with disabilities that could limit Kamp activities?",
+        "Do you have protocols for health outbreaks or other force majeure situations during Kamp?",
+        "Are there cultural or community resistance factors in target provinces?",
+        "How can current events in schools (e.g., stabbing and shooting incidents) affect PK's activities in target communities?"
+      ]},
+    ]
+  },
+  {
+    id: 'f2', badge: 'F2',
+    title: 'Advocacy & Community Reach',
+    desc: "Assess PK's ability to raise awareness, change attitudes, and engage communities about children with special needs — especially in far-flung areas.",
+    quads: [
+      { type:'s', emoji:'💪', label:'STRENGTHS (Kalakasan)', tag:'What is working well?', qs:[
+        "What advocacy messages resonate most with provincial communities?",
+        "What trust and credibility does Pedya Kamp have in gaining community support for children with special needs?",
+        "What local champions or community leaders actively support PK's advocacy?",
+        "What success stories and testimonials best amplify Pedya Kamp's advocacy?"
+      ]},
+      { type:'w', emoji:'🔧', label:'WEAKNESSES (Kahinaan)', tag:'What are we struggling with?', qs:[
+        "How does PK currently maintain presence in provinces already visited?",
+        "Does PK have a structured and consistent advocacy strategy, or does it happen case by case?",
+        "How effective is PK's current use of social media and digital platforms in building awareness?"
+      ]},
+      { type:'o', emoji:'🌱', label:'OPPORTUNITIES (Pagkakataon)', tag:'What can we take advantage of?', qs:[
+        "What national campaigns (e.g., Autism Month, PWD Week) can PK align with and participate in?",
+        "Aside from existing partners, can PK also work with LGUs for barangay-level outreach?",
+        "Are there influencers, religious organizations, or schools PK can partner with?",
+        "How can PK strengthen its impact on the LGUs it visits?",
+        "What digital platforms are growing in PK's target communities?"
+      ]},
+      { type:'t', emoji:'⚡', label:'THREATS (Banta/Hamon)', tag:'What could get in our way?', qs:[
+        "What stigma and misconceptions about disability still exist in communities PK works in?",
+        "How could political changes affect community receptiveness to PK's advocacy?",
+        "What factors might contribute to advocacy fatigue among PK's partners and volunteers?"
+      ]},
+    ]
+  },
+  {
+    id: 'f3', badge: 'F3',
+    title: 'Partnerships & Stakeholder Relations',
+    desc: "Evaluate the strength, diversity, and sustainability of PK's relationships with government agencies, corporations, NGOs, and other key stakeholders.",
+    quads: [
+      { type:'s', emoji:'💪', label:'STRENGTHS (Kalakasan)', tag:'What is working well?', qs:[
+        "Which government agencies (DSWD, PDAO, LGU) are PK's most active and reliable partners?",
+        "Which corporate partners or sponsors have consistently supported PK?",
+        "How strong are PK's relationships with partner schools and communities?",
+        "What NGO or CSO networks is Pedya Kamp affiliated with?",
+        "How strong is PK's relationship with institutions that support its work?"
+      ]},
+      { type:'w', emoji:'🔧', label:'WEAKNESSES (Kahinaan)', tag:'What are we struggling with?', qs:[
+        "Is PK overly dependent on a few key partners or sponsors?",
+        "Is stakeholder engagement sometimes inconsistent or transactional rather than relational?",
+        "Are there gaps in partnerships needed for specific activities or provinces?",
+        "How would you evaluate PK's relationship with parents of private family kampers?"
+      ]},
+      { type:'o', emoji:'🌱', label:'OPPORTUNITIES (Pagkakataon)', tag:'What can we take advantage of?', qs:[
+        "What government programs for children with special needs can PK tap (e.g., PCSO, DOH, DSWD)?",
+        "Are there CSR programs from companies aligned with PK's advocacy?",
+        "Can PK access local or international NGOs or foundations funding disability advocacy?",
+        "What inter-agency collaborations (e.g., Inter-Agency Committee on Children) can PK join?",
+        "Are there possibilities of partnering with universities for activities related to PK's work?"
+      ]},
+      { type:'t', emoji:'⚡', label:'THREATS (Banta/Hamon)', tag:'What could get in our way?', qs:[
+        "Could changes in local government leadership affect LGU partnerships and Kamp programs?",
+        "Are partner organizations shifting their priorities away from PK's focus areas?",
+        "Could political or bureaucratic delays slow down government collaborations?",
+        "Are there competing organizations that may draw key partners away from PK?"
+      ]},
+    ]
+  },
+  {
+    id: 'f4', badge: 'F4',
+    title: 'Human Resources & Volunteerism',
+    desc: "Assess PK's human capital — volunteers, staff, and BOT — and its capacity to sustain and grow program delivery.",
+    quads: [
+      { type:'s', emoji:'💪', label:'STRENGTHS (Kalakasan)', tag:'What is working well?', qs:[
+        "How diverse is your volunteer pool in terms of experience and skills?",
+        "What makes Pedya Kamp attractive to volunteers and staff?",
+        "How effective are your volunteer onboarding and training processes?",
+        "What is the organizational culture that retains key people in PK?",
+        "How effective is your selection and referral process for participants?"
+      ]},
+      { type:'w', emoji:'🔧', label:'WEAKNESSES (Kahinaan)', tag:'What are we struggling with?', qs:[
+        "Is there high volunteer turnover between Kamp cycles?",
+        "Are there skill gaps in areas like therapy, social work, or program evaluation?",
+        "Is there overdependence on a few key individuals (key person risk)?",
+        "Do we lack systems for volunteer management and recognition?",
+        "Is volunteer fatigue a growing risk, especially for long-term volunteers?"
+      ]},
+      { type:'o', emoji:'🌱', label:'OPPORTUNITIES (Pagkakataon)', tag:'What can we take advantage of?', qs:[
+        "Can PK partner with universities for internship programs to recruit skilled volunteers (e.g., Clinical Psychology)?",
+        "Are there development programs PK can explore to upskill volunteers?",
+        "Can PK develop a structured volunteer alumni network?"
+      ]},
+      { type:'t', emoji:'⚡', label:'THREATS (Banta/Hamon)', tag:'What could get in our way?', qs:[
+        "Are competing organizations recruiting from the same volunteer pool as PK?",
+        "Does geographic distance to far-flung Kamp sites limit volunteer participation?",
+        "Are there risks of volunteers not being adequately trained in child safeguarding?"
+      ]},
+    ]
+  },
+  {
+    id: 'f5', badge: 'F5',
+    title: 'Finance & Resource Mobilization',
+    desc: "Evaluate PK's financial health, funding diversity, cost-efficiency, and capacity to mobilize resources for sustainable operations.",
+    quads: [
+      { type:'s', emoji:'💪', label:'STRENGTHS (Kalakasan)', tag:'What is working well?', qs:[
+        "What is the current diversity and reliability of PK's funding sources?",
+        "How cost-efficient are your Kamp operations?",
+        "What are PK's strengths in terms of raising funds for its activities?",
+        "Is there a solid financial management system in place (accounting, auditing)?",
+        "Do we have a strong check-and-balance process in fund disbursement?"
+      ]},
+      { type:'w', emoji:'🔧', label:'WEAKNESSES (Kahinaan)', tag:'What are we struggling with?', qs:[
+        "Is there over-reliance on a single donor or funding source?",
+        "Does PK lack a dedicated fundraising team or clear strategy?",
+        "Are there gaps in financial reserves or an emergency fund?",
+        "Is there limited capacity to apply for competitive grants?",
+        "Are PK's financial reporting systems sufficient for donor requirements?"
+      ]},
+      { type:'o', emoji:'🌱', label:'OPPORTUNITIES (Pagkakataon)', tag:'What can we take advantage of?', qs:[
+        "What government grants are accessible to PK (PCSO, DOH, DSWD, NCDA)?",
+        "Are there local or international grants from foundations focused on children with disabilities?",
+        "Can PK develop an online fundraising platform or crowdfunding strategy?",
+        "Are there income-generating opportunities aligned with PK's mission?"
+      ]},
+      { type:'t', emoji:'⚡', label:'THREATS (Banta/Hamon)', tag:'What could get in our way?', qs:[
+        "How would a major donor withdrawal affect PK's operations?",
+        "Are inflation and rising costs outpacing PK's funding growth?",
+        "Could economic downturns reduce corporate and individual giving to PK?",
+        "Are there compliance risks (BIR, SEC) that could affect PK's non-profit status?",
+        "Is donor fatigue a risk with PK's current base of supporters?"
+      ]},
+    ]
+  },
+  {
+    id: 'f6', badge: 'F6',
+    title: 'Governance & Leadership',
+    desc: "Assess PK's organizational leadership, board governance, accountability structures, and regulatory compliance.",
+    quads: [
+      { type:'s', emoji:'💪', label:'STRENGTHS (Kalakasan)', tag:'What is working well?', qs:[
+        "How experienced and committed is the Board of Trustees/Incorporators to PK's mission?",
+        "What is the clarity and buy-in around PK's mission, vision, and values?",
+        "Are governance policies (financial controls, safeguarding, ethics) properly documented and followed?",
+        "Is PK compliant with SEC, BIR, DSWD, and other regulatory bodies?",
+        "How effective is leadership in guiding PK's growth?"
+      ]},
+      { type:'w', emoji:'🔧', label:'WEAKNESSES (Kahinaan)', tag:'What are we struggling with?', qs:[
+        "Is there a clear and documented succession plan for key leadership roles?",
+        "Does the board have diverse expertise and experience?",
+        "Are strategic planning and organizational review done regularly?",
+        "Are there gaps in organizational policies (HR, safeguarding, financial, child and volunteer protection)?",
+        "Is decision-making centralized in too few individuals?",
+        "Is there risk of internal conflict among leadership during growth phases?"
+      ]},
+      { type:'o', emoji:'🌱', label:'OPPORTUNITIES (Pagkakataon)', tag:'What can we take advantage of?', qs:[
+        "Are there governance training programs for non-profits in the Philippines PK should join?",
+        "Can PK join NGO networks (CODE-NGO, Volunteer Philippines) for peer learning?",
+        "Are there recognition or accreditation programs that can strengthen PK's credibility?"
+      ]},
+      { type:'t', emoji:'⚡', label:'THREATS (Banta/Hamon)', tag:'What could get in our way?', qs:[
+        "Are there regulatory changes affecting non-profit operations in the Philippines?",
+        "Could reputational risks arise from safeguarding or transparency concerns?",
+        "Could the loss of a founder or key leader destabilize PK?",
+        "Are there risks of non-compliance with donor reporting or grant conditions?"
+      ]},
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  BUILD SECTION SCREENS
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('section-screens');
+
+SECTIONS.forEach(sec => {
+  const div = document.createElement('div');
+  div.className = 'screen';
+  div.id = 'screen-' + sec.id;
+
+  let html = `
+    <div class="sec-badge">${sec.badge}</div>
+    <div class="sec-title">${sec.title}</div>
+    <div class="sec-desc">${sec.desc}</div>
+  `;
+
+  sec.quads.forEach(q => {
+    const guideId = `guide-${sec.id}-${q.type}`;
+    const qLines = q.qs.map((t,i) => `<li>${t}</li>`).join('');
+    const inputRows = [1,2,3,4,5].map(n => `
+      <div class="ans-row">
+        <div class="ans-num">${n}</div>
+        <input class="ans-input" type="text"
+          id="inp-${sec.id}-${q.type}-${n}"
+          placeholder="Type your answer here…" autocomplete="off">
+      </div>
+    `).join('');
+
+    html += `
+      <div class="quad-card">
+        <div class="quad-head ${q.type}">
+          <span class="quad-emoji">${q.emoji}</span>
+          <span class="quad-title">${q.label}</span>
+          <span class="quad-tag">${q.tag}</span>
+        </div>
+        <div class="guide-toggle" onclick="toggleGuide('${guideId}', this)">
+          <span class="arrow">▶</span> Show guide questions
+        </div>
+        <div class="guide-body" id="${guideId}">
+          <ol>${qLines}</ol>
+        </div>
+        <div class="answers">${inputRows}</div>
+      </div>
+    `;
+  });
+
+  div.innerHTML = html;
+  container.appendChild(div);
+});
+
+// Build synthesis inputs
+['syn-s','syn-w','syn-o','syn-t','syn-p'].forEach(key => {
+  const wrap = document.getElementById('ans-' + key);
+  if (!wrap) return;
+  [1,2,3,4,5].forEach(n => {
+    wrap.innerHTML += `
+      <div class="ans-row">
+        <div class="ans-num">${n}</div>
+        <input class="ans-input" type="text"
+          id="inp-${key}-${n}"
+          placeholder="Type your answer here…" autocomplete="off">
+      </div>
+    `;
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  GOOGLE SHEETS ENDPOINT
+//  After deploying your Apps Script Web App, paste its URL here:
+// ═══════════════════════════════════════════════════════════════
+const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const SCREENS = [
+  'cover','about',
+  ...SECTIONS.map(s => s.id),
+  'synthesis','summary'
+];
+let current = 0;
+
+function showScreen(idx) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + SCREENS[idx]).classList.add('active');
+
+  const total = SCREENS.length - 1; // exclude summary from %
+  const pct = Math.round((idx / (total - 1)) * 100);
+  document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+
+  const prevBtn = document.getElementById('btn-prev');
+  const nextBtn = document.getElementById('btn-next');
+
+  prevBtn.style.display = idx === 0 ? 'none' : 'inline-block';
+
+  if (SCREENS[idx] === 'cover') {
+    nextBtn.textContent = 'Start →';
+    document.getElementById('step-label').textContent = '';
+  } else if (SCREENS[idx] === 'about') {
+    nextBtn.textContent = 'Next →';
+    document.getElementById('step-label').textContent = 'About You';
+  } else if (SCREENS[idx] === 'synthesis') {
+    nextBtn.textContent = 'Submit →';
+    nextBtn.className = 'btn btn-success';
+    document.getElementById('step-label').textContent = 'Final Section';
+  } else if (SCREENS[idx] === 'summary') {
+    nextBtn.style.display = 'none';
+    document.getElementById('step-label').textContent = 'Complete ✓';
+  } else {
+    nextBtn.textContent = 'Next →';
+    nextBtn.className = 'btn btn-primary';
+    const secIdx = SECTIONS.findIndex(s => s.id === SCREENS[idx]);
+    document.getElementById('step-label').textContent =
+      `Section ${secIdx + 1} of ${SECTIONS.length}`;
+  }
+}
+
+function navigate(dir) {
+  if (dir === 1 && SCREENS[current] === 'about') {
+    if (!document.getElementById('f-name').value.trim()) {
+      alert('Please enter your name before continuing.');
+      return;
+    }
+  }
+  if (dir === 1 && SCREENS[current] === 'synthesis') {
+    submitToSheets();
+    return; // submitToSheets handles navigation after POST
+  }
+  current = Math.max(0, Math.min(SCREENS.length - 1, current + dir));
+  showScreen(current);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SUBMIT TO GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════════
+function collectAllData() {
+  const data = {
+    timestamp: new Date().toISOString(),
+    name:  document.getElementById('f-name').value.trim(),
+    role:  document.getElementById('f-role').value.trim(),
+    date:  document.getElementById('f-date').value.trim(),
+  };
+
+  SECTIONS.forEach(sec => {
+    sec.quads.forEach(q => {
+      for (let n = 1; n <= 5; n++) {
+        const el = document.getElementById(`inp-${sec.id}-${q.type}-${n}`);
+        data[`${sec.id}_${q.type}_${n}`] = el ? el.value.trim() : '';
+      }
+    });
+  });
+
+  ['syn-s','syn-w','syn-o','syn-t','syn-p'].forEach(key => {
+    for (let n = 1; n <= 5; n++) {
+      const el = document.getElementById(`inp-${key}-${n}`);
+      data[`${key.replace('-','_')}_${n}`] = el ? el.value.trim() : '';
+    }
+  });
+
+  return data;
+}
+
+function submitToSheets() {
+  const btn = document.getElementById('btn-next');
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  const data = collectAllData();
+  buildSummary(); // build summary in background
+
+  if (!SCRIPT_URL || SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+    // No backend yet — still show summary
+    current = SCREENS.length - 1;
+    showScreen(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    btn.textContent = 'Submit →';
+    btn.disabled = false;
+    return;
+  }
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // Google Apps Script requires no-cors
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  .then(() => {
+    current = SCREENS.length - 1;
+    showScreen(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  })
+  .catch(() => {
+    // Still show summary even if fetch fails
+    current = SCREENS.length - 1;
+    showScreen(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    console.warn('Could not reach Google Sheets endpoint. Responses are shown below.');
+  })
+  .finally(() => {
+    btn.textContent = 'Submit →';
+    btn.disabled = false;
+  });
+}
+
+function toggleGuide(id, btn) {
+  const body = document.getElementById(id);
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.querySelector('.arrow').textContent = body.classList.contains('open') ? '▼' : '▶';
+  btn.childNodes[1].textContent = body.classList.contains('open')
+    ? ' Hide guide questions' : ' Show guide questions';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  COLLECT & DISPLAY SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function getVals(prefix, count = 5) {
+  return Array.from({length: count}, (_, i) => {
+    const el = document.getElementById(`inp-${prefix}-${i + 1}`);
+    return el ? el.value.trim() : '';
+  }).filter(v => v !== '');
+}
+
+function buildSummary() {
+  const name  = document.getElementById('f-name').value.trim() || '(not provided)';
+  const role  = document.getElementById('f-role').value.trim() || '(not provided)';
+  const date  = document.getElementById('f-date').value.trim() || '(not provided)';
+
+  let html = '';
+
+  // Respondent
+  html += `
+    <div class="sum-section">
+      <div class="sum-sec-title">Respondent</div>
+      <div style="font-size:14px;color:#444;line-height:1.9">
+        <strong>Name:</strong> ${name}<br>
+        <strong>Role:</strong> ${role}<br>
+        <strong>Date:</strong> ${date}
+      </div>
+    </div>
+  `;
+
+  // Sections
+  SECTIONS.forEach(sec => {
+    html += `<div class="sum-section"><div class="sum-sec-title">${sec.badge}: ${sec.title}</div>`;
+
+    sec.quads.forEach(q => {
+      const vals = getVals(`${sec.id}-${q.type}`);
+      html += `<div class="sum-quad">
+        <div class="sum-q-label">${q.emoji} ${q.label}</div>`;
+      if (vals.length === 0) {
+        html += `<div class="sum-empty">No responses entered</div>`;
+      } else {
+        vals.forEach(v => { html += `<div class="sum-item">${escHtml(v)}</div>`; });
+      }
+      html += `</div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  // Synthesis
+  const synLabels = [
+    ['🏆', 'Top Organizational Strengths', 'syn-s'],
+    ['🔧', 'Top Organizational Weaknesses', 'syn-w'],
+    ['🌱', 'Top Organizational Opportunities', 'syn-o'],
+    ['⚡', 'Top Organizational Threats', 'syn-t'],
+    ['📌', 'Strategic Priorities', 'syn-p'],
+  ];
+  html += `<div class="sum-section"><div class="sum-sec-title">Overall SWOT Synthesis</div>`;
+  synLabels.forEach(([emoji, label, key]) => {
+    const vals = getVals(key);
+    html += `<div class="sum-quad">
+      <div class="sum-q-label">${emoji} ${label}</div>`;
+    if (vals.length === 0) {
+      html += `<div class="sum-empty">No responses entered</div>`;
+    } else {
+      vals.forEach(v => { html += `<div class="sum-item">${escHtml(v)}</div>`; });
+    }
+    html += `</div>`;
+  });
+  html += `</div>`;
+
+  document.getElementById('summary-body').innerHTML = html;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════════════
+function buildText() {
+  const name = document.getElementById('f-name').value.trim() || '(not provided)';
+  const role = document.getElementById('f-role').value.trim() || '(not provided)';
+  const date = document.getElementById('f-date').value.trim() || '(not provided)';
+
+  let txt = 'PEDYA KAMP — SWOT ANALYSIS RESPONSES\n';
+  txt += '='.repeat(45) + '\n';
+  txt += `Name:  ${name}\nRole:  ${role}\nDate:  ${date}\n\n`;
+
+  SECTIONS.forEach(sec => {
+    txt += '-'.repeat(45) + '\n';
+    txt += `${sec.badge.toUpperCase()}: ${sec.title.toUpperCase()}\n`;
+    txt += '-'.repeat(45) + '\n';
+    sec.quads.forEach(q => {
+      txt += `\n${q.emoji}  ${q.label}\n`;
+      const vals = getVals(`${sec.id}-${q.type}`);
+      if (vals.length === 0) {
+        txt += '  (no responses entered)\n';
+      } else {
+        vals.forEach((v, i) => { txt += `  ${i + 1}. ${v}\n`; });
+      }
+    });
+    txt += '\n';
+  });
+
+  txt += '='.repeat(45) + '\n';
+  txt += 'OVERALL SWOT SYNTHESIS\n' + '='.repeat(45) + '\n';
+  const synLabels = [
+    ['🏆', 'Top Organizational Strengths', 'syn-s'],
+    ['🔧', 'Top Organizational Weaknesses', 'syn-w'],
+    ['🌱', 'Top Organizational Opportunities', 'syn-o'],
+    ['⚡', 'Top Organizational Threats', 'syn-t'],
+    ['📌', 'Strategic Priorities', 'syn-p'],
+  ];
+  synLabels.forEach(([emoji, label, key]) => {
+    txt += `\n${emoji}  ${label}\n`;
+    const vals = getVals(key);
+    if (vals.length === 0) { txt += '  (no responses entered)\n'; }
+    else vals.forEach((v, i) => { txt += `  ${i + 1}. ${v}\n`; });
+  });
+
+  return txt;
+}
+
+function downloadTxt() {
+  const name = (document.getElementById('f-name').value.trim() || 'response').replace(/\s+/g, '_');
+  const blob = new Blob([buildText()], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `PK_SWOT_${name}.txt`;
+  a.click();
+}
+
+function copyAll() {
+  navigator.clipboard.writeText(buildText()).then(() => {
+    alert('Responses copied to clipboard! You can now paste them into an email or Google Sheet.');
+  }).catch(() => {
+    alert('Could not copy automatically. Please select all text and copy manually.');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+showScreen(0);
+</script>
+</body>
+</html>
