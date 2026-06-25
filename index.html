@@ -252,58 +252,6 @@
   <!-- Functional area screens rendered by JS -->
   <div id="section-screens"></div>
 
-  <!-- ══ SYNTHESIS ═══════════════════════════════════════════ -->
-  <div class="screen" id="screen-synthesis">
-    <div class="sec-badge">Final Section</div>
-    <div class="sec-title">🔭 Overall SWOT Synthesis</div>
-    <div class="sec-desc">You've reflected on all six areas — great work! Now step back and look at the big picture. What stands out most across the whole organization? Enter one item per box.</div>
-
-    <div class="quad-card">
-      <div class="quad-head s">
-        <span class="quad-emoji">🏆</span>
-        <span class="quad-title">Top Organizational STRENGTHS</span>
-        <span class="quad-tag">across all areas</span>
-      </div>
-      <div class="answers" id="ans-syn-s"></div>
-    </div>
-
-    <div class="quad-card">
-      <div class="quad-head w">
-        <span class="quad-emoji">🔧</span>
-        <span class="quad-title">Top Organizational WEAKNESSES</span>
-        <span class="quad-tag">across all areas</span>
-      </div>
-      <div class="answers" id="ans-syn-w"></div>
-    </div>
-
-    <div class="quad-card">
-      <div class="quad-head o">
-        <span class="quad-emoji">🌱</span>
-        <span class="quad-title">Top Organizational OPPORTUNITIES</span>
-        <span class="quad-tag">across all areas</span>
-      </div>
-      <div class="answers" id="ans-syn-o"></div>
-    </div>
-
-    <div class="quad-card">
-      <div class="quad-head t">
-        <span class="quad-emoji">⚡</span>
-        <span class="quad-title">Top Organizational THREATS</span>
-        <span class="quad-tag">across all areas</span>
-      </div>
-      <div class="answers" id="ans-syn-t"></div>
-    </div>
-
-    <div class="quad-card">
-      <div class="quad-head" style="background:#f0f4ff;">
-        <span class="quad-emoji">📌</span>
-        <span class="quad-title">Strategic Priorities</span>
-        <span class="quad-tag">for the next planning period</span>
-      </div>
-      <div class="answers" id="ans-syn-p"></div>
-    </div>
-  </div>
-
   <!-- ══ SUMMARY ════════════════════════════════════════════ -->
   <div class="screen" id="screen-summary">
     <div class="summary-hero">
@@ -580,21 +528,6 @@ SECTIONS.forEach(sec => {
   container.appendChild(div);
 });
 
-// Build synthesis inputs
-['syn-s','syn-w','syn-o','syn-t','syn-p'].forEach(key => {
-  const wrap = document.getElementById('ans-' + key);
-  if (!wrap) return;
-  [1,2,3,4,5].forEach(n => {
-    wrap.innerHTML += `
-      <div class="ans-row">
-        <div class="ans-num">${n}</div>
-        <input class="ans-input" type="text"
-          id="inp-${key}-${n}"
-          placeholder="Type your answer here…" autocomplete="off">
-      </div>
-    `;
-  });
-});
 
 // ═══════════════════════════════════════════════════════════════
 //  GOOGLE SHEETS ENDPOINT
@@ -608,7 +541,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIEqrfKqKvoIokzagOJ
 const SCREENS = [
   'cover','about',
   ...SECTIONS.map(s => s.id),
-  'synthesis','summary'
+  'summary'
 ];
 let current = 0;
 
@@ -631,17 +564,18 @@ function showScreen(idx) {
   } else if (SCREENS[idx] === 'about') {
     nextBtn.textContent = 'Next →';
     document.getElementById('step-label').textContent = 'About You';
-  } else if (SCREENS[idx] === 'synthesis') {
-    nextBtn.textContent = 'Submit →';
-    nextBtn.className = 'btn btn-success';
-    document.getElementById('step-label').textContent = 'Final Section';
   } else if (SCREENS[idx] === 'summary') {
     nextBtn.style.display = 'none';
     document.getElementById('step-label').textContent = 'Complete ✓';
   } else {
-    nextBtn.textContent = 'Next →';
-    nextBtn.className = 'btn btn-primary';
     const secIdx = SECTIONS.findIndex(s => s.id === SCREENS[idx]);
+    if (secIdx === SECTIONS.length - 1) {
+      nextBtn.textContent = 'Submit →';
+      nextBtn.className = 'btn btn-success';
+    } else {
+      nextBtn.textContent = 'Next →';
+      nextBtn.className = 'btn btn-primary';
+    }
     document.getElementById('step-label').textContent =
       `Section ${secIdx + 1} of ${SECTIONS.length}`;
   }
@@ -654,7 +588,7 @@ function navigate(dir) {
       return;
     }
   }
-  if (dir === 1 && SCREENS[current] === 'synthesis') {
+  if (dir === 1 && SCREENS[current] === SECTIONS[SECTIONS.length - 1].id) {
     submitToSheets();
     return; // submitToSheets handles navigation after POST
   }
@@ -681,13 +615,6 @@ function collectAllData() {
         data[`${sec.id}_${q.type}_${n}`] = el ? el.value.trim() : '';
       }
     });
-  });
-
-  ['syn-s','syn-w','syn-o','syn-t','syn-p'].forEach(key => {
-    for (let n = 1; n <= 5; n++) {
-      const el = document.getElementById(`inp-${key}-${n}`);
-      data[`${key.replace('-','_')}_${n}`] = el ? el.value.trim() : '';
-    }
   });
 
   return data;
@@ -792,28 +719,6 @@ function buildSummary() {
     html += `</div>`;
   });
 
-  // Synthesis
-  const synLabels = [
-    ['🏆', 'Top Organizational Strengths', 'syn-s'],
-    ['🔧', 'Top Organizational Weaknesses', 'syn-w'],
-    ['🌱', 'Top Organizational Opportunities', 'syn-o'],
-    ['⚡', 'Top Organizational Threats', 'syn-t'],
-    ['📌', 'Strategic Priorities', 'syn-p'],
-  ];
-  html += `<div class="sum-section"><div class="sum-sec-title">Overall SWOT Synthesis</div>`;
-  synLabels.forEach(([emoji, label, key]) => {
-    const vals = getVals(key);
-    html += `<div class="sum-quad">
-      <div class="sum-q-label">${emoji} ${label}</div>`;
-    if (vals.length === 0) {
-      html += `<div class="sum-empty">No responses entered</div>`;
-    } else {
-      vals.forEach(v => { html += `<div class="sum-item">${escHtml(v)}</div>`; });
-    }
-    html += `</div>`;
-  });
-  html += `</div>`;
-
   document.getElementById('summary-body').innerHTML = html;
 }
 
@@ -849,22 +754,6 @@ function buildText() {
     txt += '\n';
   });
 
-  txt += '='.repeat(45) + '\n';
-  txt += 'OVERALL SWOT SYNTHESIS\n' + '='.repeat(45) + '\n';
-  const synLabels = [
-    ['🏆', 'Top Organizational Strengths', 'syn-s'],
-    ['🔧', 'Top Organizational Weaknesses', 'syn-w'],
-    ['🌱', 'Top Organizational Opportunities', 'syn-o'],
-    ['⚡', 'Top Organizational Threats', 'syn-t'],
-    ['📌', 'Strategic Priorities', 'syn-p'],
-  ];
-  synLabels.forEach(([emoji, label, key]) => {
-    txt += `\n${emoji}  ${label}\n`;
-    const vals = getVals(key);
-    if (vals.length === 0) { txt += '  (no responses entered)\n'; }
-    else vals.forEach((v, i) => { txt += `  ${i + 1}. ${v}\n`; });
-  });
-
   return txt;
 }
 
@@ -887,4 +776,9 @@ function copyAll() {
 
 // ═══════════════════════════════════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+showScreen(0);
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
